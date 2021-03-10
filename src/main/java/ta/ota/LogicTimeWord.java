@@ -1,10 +1,11 @@
-package timedWord;
+package ta.ota;
 
-import timedAction.LogicTimedAction;
+import timedWord.TimedWord;
 
 import java.util.List;
 
-public class LogicTimeWord extends TimedWord<LogicTimedAction>{
+//只针对OTA
+public class LogicTimeWord extends TimedWord<LogicTimedAction> {
 
     public LogicTimeWord(List<LogicTimedAction> timedActions) {
         super(timedActions);

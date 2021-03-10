@@ -2,8 +2,6 @@ package timedWord;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import timedAction.DelayTimedAction;
-import timedAction.LogicTimedAction;
 import timedAction.TimedAction;
 
 import java.util.ArrayList;

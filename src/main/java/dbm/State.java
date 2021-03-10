@@ -3,10 +3,7 @@ package dbm;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ta.Clock;
 import ta.TaLocation;
-
-import java.util.List;
 
 /*
 时间自动机的状态，包括节点和DBM时间约束

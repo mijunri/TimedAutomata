@@ -56,12 +56,12 @@ public class TAUtil {
             flag:
             for (TaTransition t : taTransitions) {
                 //获取该迁移的时钟约束
-                Map<TimeGuard, Clock> timeGuardClockMap = t.getTimeGuardClockMap();
+                Map<Clock, TimeGuard> timeGuardClockMap = t.getTimeGuardClockMap();
                 //对当前DBM进行拷贝
                 DBM dbm = current.getDbm().copy();
                 //求约束后的DBM
-                for (Map.Entry<TimeGuard, Clock> entry : timeGuardClockMap.entrySet()) {
-                    dbm.and(entry.getValue(), entry.getKey());
+                for (Map.Entry<Clock, TimeGuard> entry : timeGuardClockMap.entrySet()) {
+                    dbm.and(entry.getKey(), entry.getValue());
                 }
                 //最小化
                 dbm.canonical();
@@ -135,7 +135,7 @@ public class TAUtil {
                         TaLocation sourceLocation = pairLocationMap.get(sourcePair);
                         TaLocation targetLocation = pairLocationMap.get(targetPair);
                         //时钟约束求并集
-                        Map<TimeGuard, Clock> timeGuardClockMap = new HashMap<>();
+                        Map<Clock, TimeGuard> timeGuardClockMap = new HashMap<>();
                         timeGuardClockMap.putAll(t1.getTimeGuardClockMap());
                         timeGuardClockMap.putAll(t2.getTimeGuardClockMap());
                         //重置时钟集合求并集

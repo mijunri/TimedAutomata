@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import timedWord.ResetLogicTimeWord;
 
 import java.util.*;
 
@@ -77,38 +76,6 @@ public class TA {
     public boolean containsSymbol(String symbol) {
         return sigma.contains(symbol);
     }
-
-
-//    public TaLocation reach(ResetLogicTimeWord resetLogicTimeWord){
-//        TaLocation location = getInitLocation();
-//        Map<Clock,Double> clockValueMap = new HashMap<>();
-//
-//        List<TimeWord> timeWordList = timeWords.getWordList();
-//        boolean isReset = true;
-//        TimeWord pre = null;
-//        for(int i = 0; i < timeWordList.size(); i++){
-//            TimeWord word = new TimeWord(timeWordList.get(i).getAction(),timeWordList.get(i).getValue());
-//            if(!isReset){
-//                double value = word.getValue();
-//                value = value + pre.getValue();
-//                word.setValue(value);
-//            }
-//            List<Transition> transitionList = getTransitions(location,word.getAction(),null);
-//            for(Transition t: transitionList){
-//                if(t.isPass(word)){
-//                    location = t.getTargetLocation();
-//                    if(t.isReset()){
-//                        isReset = true;
-//                    }else {
-//                        isReset = false;
-//                        pre = word;
-//                    }
-//                    break;
-//                }
-//            }
-//        }
-//        return location;
-//    }
 
 
     public Set<Clock> copyClockSet() {
