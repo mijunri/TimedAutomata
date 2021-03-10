@@ -8,13 +8,11 @@
     <artifactId>ta</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.12</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -28,5 +26,21 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
