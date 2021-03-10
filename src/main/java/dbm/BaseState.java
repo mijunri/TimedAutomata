@@ -11,26 +11,11 @@ import ta.TaLocation;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class State {
-    private TaLocation location;
+public abstract class BaseState {
     private DBM dbm;
-    private State preState;
-    private String symbol;
 
-    public State(TaLocation location, DBM dbm) {
-        this.location = location;
-        this.dbm = dbm;
-    }
+    public abstract BaseState getPreState();
 
-    public boolean include(State state){
-        if(state.getLocation() != getLocation()){
-            return false;
-        }
-        if(!dbm.include(state.dbm)){
-            return false;
-        }
-        return true;
-    }
 
 //    @Override
 //    public String toString(){

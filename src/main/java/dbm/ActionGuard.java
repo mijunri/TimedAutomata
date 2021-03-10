@@ -1,0 +1,12 @@
+package dbm;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import ta.TimeGuard;
+
+@Data
+@AllArgsConstructor
+public class ActionGuard {
+    private String symbol;
+    private TimeGuard timeGuard;
+}

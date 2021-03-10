@@ -1,6 +1,7 @@
 package ta;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ public class TimeGuard {
 
     private int right;
 
+    public TimeGuard() {
+    }
 
     //根据区间字符串创建一个时间区间
     public TimeGuard(String pattern){

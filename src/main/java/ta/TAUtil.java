@@ -1,16 +1,18 @@
 package ta;
 
+import dbm.BaseState;
 import dbm.DBM;
-import dbm.State;
+import dbm.LocationState;
+import dbm.TransitionState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.*;
 
-public class TAUtil {
+public final class TAUtil {
 
     //时间自动机的可达性算法，判断当前自动机是否存在可达的接收状态
-    public List<State> reachable(TA ta) {
+    public static List<TransitionState> reachable(TA ta) {
         //获取时钟数组
         List<Clock> clockList = new ArrayList<>(ta.getClockSet());
         //初始化DBM
@@ -18,37 +20,32 @@ public class TAUtil {
         //获取初始节点
         TaLocation initLocation = ta.getInitLocation();
         //创建已访问的状态空间
-        Set<State> visited = new HashSet<>();
+        Set<LocationState> visited = new HashSet<>();
         //创建待访问的状态队列
-        LinkedList<State> waitQueue = new LinkedList<>();
+        LinkedList<LocationState> waitQueue = new LinkedList<>();
         //初始状态
-        State state = new State(initLocation, initDbm);
+        LocationState initLocationState = new LocationState(initDbm, initLocation);
         //将初始状态加入到待访问队列中,这里的waitQueue中的都是以访问状态，他们的后续节点状态是未访问的
-        waitQueue.offer(state);
+        waitQueue.offer(initLocationState);
         //遍历待访问队列，这里采用了BSF的方式
         while (!waitQueue.isEmpty()) {
             //取出一个状态
-            State current = waitQueue.poll();
+            LocationState current = waitQueue.poll();
             //将状态加入到已访问集合中
-            visited.add(state);
+            visited.add(current);
             //获取当前状态的节点
             TaLocation location = current.getLocation();
             //判断，当前节点是否是不接收状态
             //如果是接收状态,返回状态路径
             if (location.isAccept()) {
-                List<State> states = new ArrayList<>();
-                states.add(current);
-                while (current.getPreState() != null) {
-                    current = current.getPreState();
-                    states.add(current);
-                }
-                List<State> list = new ArrayList<>();
-                for (int i = states.size() - 1; i >= 0; i--) {
-                    if (i % 2 == 1) {
-                        list.add(states.get(i));
+                List<TransitionState> transitionStates = new LinkedList<>();
+                BaseState state = current;
+                while (null != state){
+                    if (state instanceof TransitionState){
+                        transitionStates.add(0, (TransitionState) state);
                     }
+                    state = state.getPreState();
                 }
-                return list;
             }
             //否则，获取当前节点的后续迁移
             List<TaTransition> taTransitions = ta.getTransitions(location, null, null);
@@ -68,22 +65,22 @@ public class TAUtil {
                 //判断与约束是否合理
                 if (dbm.isConsistent()) {
                     //迁移状态
-                    State guardState = new State(t.getTargetLocation(), dbm, current, t.getSymbol());
+                    TransitionState transitionState = new TransitionState(dbm, t.getSymbol(), current);
                     dbm = dbm.copy();
                     for (Clock c : t.getResetClockSet()) {
                         dbm.reset(c);
                     }
                     dbm.canonical();
                     dbm.up();
-                    State newState = new State(t.getTargetLocation(), dbm);
-                    newState.setPreState(guardState);
-                    for (State n : visited) {
-                        if (n.include(newState)) {
+                    LocationState newLocationState = new LocationState(dbm, t.getTargetLocation());
+                    newLocationState.setPreState(transitionState);
+                    for (LocationState n : visited) {
+                        if (n.include(newLocationState)) {
                             continue flag;
                         }
                     }
-                    visited.add(newState);
-                    waitQueue.offer(newState);
+                    visited.add(newLocationState);
+                    waitQueue.offer(newLocationState);
                 }
             }
         }
@@ -91,7 +88,7 @@ public class TAUtil {
     }
 
     //时间自动机的平行组合
-    public TA parallelCombination(TA ta1, TA ta2) {
+    public static TA parallelCombination(TA ta1, TA ta2) {
 
         //存放新旧节点对应关系的map
         Map<Pair, TaLocation> pairLocationMap = new HashMap<>();
@@ -207,7 +204,6 @@ public class TAUtil {
     //时间自动机求补
     public static TA completeTA(TA ta) {
         ta = ta.copy();
-
         return null;
     }
 
@@ -219,4 +215,6 @@ public class TAUtil {
         }
         return neg;
     }
+
+
 }
