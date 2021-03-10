@@ -1,109 +1,147 @@
 package ta;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TimeGuard {
 
     public static final int MAX_TIME = 1000;
 
-    private boolean leftOpen;
+    private boolean lowerBoundOpen;
 
-    private boolean rightOpen;
+    private boolean upperBoundOpen;
 
-    private int left;
+    private int lowerBound;
 
-    private int right;
+    private int upperBound;
 
-    public TimeGuard() {
+    public boolean isLowerBoundClose(){
+        return !lowerBoundOpen;
     }
 
-    //根据区间字符串创建一个时间区间
+    public boolean isUpperBoundClose(){
+        return !upperBoundOpen;
+    }
+
     public TimeGuard(String pattern){
         pattern = pattern.trim();
-        if(pattern.charAt(0) == '['){
-            setLeftOpen(false);
-        }else if(pattern.charAt(0) == '('){
-            setLeftOpen(true);
-        }else {
-            throw new RuntimeException("guard pattern error");
-        }
         int size = pattern.length();
-        if(pattern.charAt(size-1) == ']'){
-            setRightOpen(false);
-        }else if(pattern.charAt(size-1) == ')'){
-            setRightOpen(true);
-        }else {
+        char firstChar = pattern.charAt(0);
+        char lastChar = pattern.charAt(size-1);
+
+        switch (firstChar){
+            case '[':
+                setLowerBoundOpen(false);
+                break;
+            case '(':
+                setLowerBoundOpen(true);
+                break;
+            default:
+                throw new RuntimeException("guard pattern error");
+        }
+
+        switch (lastChar){
+            case ']':
+                setUpperBoundOpen(false);
+                break;
+            case ')':
+                setUpperBoundOpen(true);
+                break;
+            default:
+                throw new RuntimeException("guard pattern error");
+        }
+
+        String[] numbers = pattern.split("\\,|\\[|\\(|\\]|\\)");
+        if (numbers.length != 3){
             throw new RuntimeException("guard pattern error");
         }
-        String[] numbers = pattern.split("\\,|\\[|\\(|\\]|\\)");
-        int left = Integer.parseInt(numbers[1]);
-        int right;
-        if(numbers[2].equals("+")){
-            right = MAX_TIME;
-        }else {
-            right = Integer.parseInt(numbers[2]);
+
+        int lowerBound, upperBound = 0;
+
+        try{
+            String num1 = numbers[1];
+            String num2 = numbers[2];
+            lowerBound = Integer.parseInt(num1);
+            upperBound = num2.equals("+")?MAX_TIME:Integer.parseInt(num2);
+        }catch (Exception e){
+            throw new RuntimeException("guard pattern error");
         }
-        setLeft(left);
-        setRight(right);
+
+        setLowerBound(lowerBound);
+        setUpperBound(upperBound);
     }
 
-    public TimeGuard(boolean leftOpen, boolean rightOpen, int left, int right) {
-        this.leftOpen = leftOpen;
-        this.rightOpen = rightOpen;
-        this.left = left;
-        this.right = right;
-    }
+//    public static TimeGuard bottomGuard(LogicAction action){
+//        double time = action.getValue();
+//        boolean leftOpen,rightOpen;
+//        int left,right;
+//        if(time == (int)time){
+//            leftOpen = false;
+//            left = (int)time;
+//            rightOpen = false;
+//            right = (int)time;
+//        }
+//        else {
+//            leftOpen = true;
+//            left = (int)time;
+//            rightOpen = true;
+//            right = (int)time+1;
+//        }
+//        return new TimeGuard(leftOpen,rightOpen,left,right);
+//    }
+
+//    public static TimeGuard bottomGuard(ResetLogicAction action){
+//        double time = action.getValue();
+//        boolean leftOpen,rightOpen;
+//        int left,right;
+//        if(time == (int)time){
+//            leftOpen = false;
+//            left = (int)time;
+//            rightOpen = false;
+//            right = (int)time;
+//        }
+//        else {
+//            leftOpen = true;
+//            left = (int)time;
+//            rightOpen = true;
+//            right = (int)time+1;
+//        }
+//        return new TimeGuard(leftOpen,rightOpen,left,right);
+//    }
 
 
+    //转成整型再比较
+    public boolean isPass(double doubleValue){
+        int intValue = (int)((doubleValue+0.05)*10);
 
-    public TimeGuard(double timeValue){
-        double time = timeValue;
-        if(time == (int)time){
-            this.leftOpen = false;
-            this.rightOpen = false;
-            this.left = (int)time;
-            this.right = (int)time;
-        }
-        else {
-            this.leftOpen = true;
-            this.rightOpen = true;
-            this.left = (int)time;
-            this.right = (int)time+1;
-        }
-    }
+        int lowerBound = getLowerBound()*10;
+        int upperBound = getUpperBound()*10;
 
-    public boolean isPass(double value){
-        int val = (int)((value+0.05)*10);
-        int le = left*10;
-        int ri = right*10;
-        if(leftOpen && rightOpen){
-            if(val > le && val < ri){
+        if(isLowerBoundOpen() && isUpperBoundOpen()){
+            if(intValue > lowerBound && intValue < upperBound){
                 return true;
             }
-            return false;
         }
-        if(!leftOpen && rightOpen){
-            if(val >= le && val < ri){
+        if(isLowerBoundClose() && isUpperBoundOpen()){
+            if(intValue >= lowerBound && intValue < upperBound){
                 return true;
             }
-            return false;
         }
-        if(leftOpen && !rightOpen){
-            if(val > le && val <= ri){
+        if(isLowerBoundOpen() && isUpperBoundClose()){
+            if(intValue > lowerBound && intValue <= upperBound){
                 return true;
             }
-            return false;
         }
-        if(!leftOpen && !rightOpen){
-            if(val >= le && val <= ri){
+        if(isLowerBoundClose() && isUpperBoundClose()){
+            if(intValue >= lowerBound && intValue <= upperBound){
                 return true;
             }
-            return false;
         }
         return false;
     }
@@ -111,14 +149,14 @@ public class TimeGuard {
     @Override
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
-        if(leftOpen){
+        if(isLowerBoundOpen()){
             stringBuilder.append("(");
         }
         else {
             stringBuilder.append("[");
         }
-        stringBuilder.append(left).append(",").append(right);
-        if(rightOpen){
+        stringBuilder.append(lowerBound).append(",").append(upperBound);
+        if(isUpperBoundOpen()){
             stringBuilder.append(")");
         }else {
             stringBuilder.append("]");
@@ -127,79 +165,7 @@ public class TimeGuard {
     }
 
     public TimeGuard copy(){
-        return new TimeGuard(leftOpen,rightOpen,left,right);
+        return new TimeGuard(lowerBoundOpen,upperBoundOpen,lowerBound,upperBound);
     }
-
-    public String toExpression(){
-        StringBuilder stringBuilder = new StringBuilder();
-        if(leftOpen){
-            stringBuilder.append("x>"+left);
-        }else {
-            stringBuilder.append("x >="+left);
-        }
-        stringBuilder.append(" && ");
-        if(rightOpen){
-            stringBuilder.append("x<"+right);
-        }else {
-            stringBuilder.append("x<="+right);
-        }
-        return stringBuilder.toString();
-    }
-
-    //求和另一个timeGuard的交集
-    public TimeGuard intersection(TimeGuard timeGuard){
-        int l,r;
-        boolean lo,ro;
-        if(left < timeGuard.left){
-            l = timeGuard.left;
-            lo = timeGuard.leftOpen;
-        }else if(left == timeGuard.left){
-            l = timeGuard.left;
-            lo = leftOpen || timeGuard.leftOpen;
-        }else {
-            l = left;
-            lo = leftOpen;
-        }
-
-        if(right > timeGuard.right){
-            r = timeGuard.right;
-            ro = timeGuard.rightOpen;
-        }else if(right == timeGuard.right){
-            r = timeGuard.right;
-            ro = rightOpen || timeGuard.rightOpen;
-        }else {
-            r = right;
-            ro = rightOpen;
-        }
-
-        if(l > r){
-            return null;
-        }else if(l == r){
-            if(lo || ro){
-                return null;
-            }else {
-                return new TimeGuard(lo,ro,l,r);
-            }
-        }else {
-            return new TimeGuard(lo,ro,l,r);
-        }
-    }
-
-    public List<Double> getALlValues(){
-        int left = getLeft()*10;
-        if (leftOpen){
-            left+=1;
-        }
-        int right = getRight()*10;
-        if(rightOpen){
-            right-=1;
-        }
-        List<Double> list = new ArrayList<>();
-        for(int j = left; j <=right; j++){
-            list.add(j/10.0);
-        }
-        return list;
-    }
-
 
 }

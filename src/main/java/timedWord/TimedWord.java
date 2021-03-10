@@ -5,7 +5,9 @@ import lombok.Data;
 import timedAction.TimedAction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -37,6 +39,14 @@ public class TimedWord<T extends TimedAction> {
             return emptyWord();
         }
     }
+
+    public TimedWord<T> concat(T timedAction){
+        List<T> timedActions1 = new ArrayList<>();
+        timedActions1.add(timedAction);
+        return new TimedWord<>(timedActions1);
+    }
+
+
 
     @Override
     public String toString(){

@@ -56,17 +56,16 @@ public class DBM {
         }
     }
 
-    //and操作，将DBM与某一个时钟约束求并集
+    //and操作
     public void and(Clock c, TimeGuard timeGuard){
-        //因为0表示零时钟，所以索引下标加一
-        int index = clockList.indexOf(c)+1;
-        Value right = new Value(timeGuard.getRight(),!timeGuard.isRightOpen());
-        if(right.compareTo(matrix[index][0]) < 0){
-            matrix[index][0] = right;
+        int index = clockList.indexOf(c);
+        Value upperBound = new Value(timeGuard.getUpperBound(),!timeGuard.isUpperBoundOpen());
+        if(upperBound.compareTo(matrix[index+1][0]) < 0){
+            matrix[index+1][0] = upperBound;
         }
-        Value left = new Value(timeGuard.getLeft()*-1,!timeGuard.isLeftOpen());
-        if(left.compareTo(matrix[0][index]) < 0){
-            matrix[0][index] = left;
+        Value lowerBound = new Value(timeGuard.getLowerBound()*(-1),!timeGuard.isLowerBoundOpen());
+        if(lowerBound.compareTo(matrix[0][index+1]) < 0){
+            matrix[0][index+1] = lowerBound;
         }
     }
 

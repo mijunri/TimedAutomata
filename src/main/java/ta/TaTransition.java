@@ -30,6 +30,10 @@ public class TaTransition {
     }
 
 
+    public boolean isReset(Clock clock){
+        return resetClockSet.contains(clock);
+    }
+
     public boolean isPass(String symbol, Map<Clock, Double> clockValueMap){
         if(StringUtils.equals(symbol, this.symbol)){
             for(Clock clock: clockValueMap.keySet()){
