@@ -1,18 +1,17 @@
 package ta;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TA {
     private String name;
     private Set<Clock> clockSet;
@@ -56,7 +55,7 @@ public class TA {
             Iterator<TaTransition> iterator = list.iterator();
             while (iterator.hasNext()) {
                 TaTransition t = iterator.next();
-                if (!StringUtils.equals(t.getSymbol(),symbol)) {
+                if (!StringUtils.equals(t.getSymbol(), symbol)) {
                     iterator.remove();
                 }
             }
@@ -74,13 +73,60 @@ public class TA {
         return list;
     }
 
+    public boolean containsSymbol(String symbol) {
+        return sigma.contains(symbol);
+    }
+
+    public Set<Clock> copyClockSet() {
+        Set<Clock> newClockSet = new HashSet<>();
+        clockSet.stream().forEach(e -> {
+            newClockSet.add(e.copy());
+        });
+        return newClockSet;
+    }
+
+    public List<TaLocation> copyLocations() {
+        List<TaLocation> newLocations = new ArrayList<>();
+        locations.stream().forEach(e -> {
+            newLocations.add(e.copy());
+        });
+        return newLocations;
+    }
+
+    public List<TaTransition> copyTransitions() {
+        List<TaTransition> newTransitions = new ArrayList<>();
+        transitions.stream().forEach(e -> {
+            newTransitions.add(e.copy());
+        });
+        return newTransitions;
+    }
+
+    public Set<String> copySigma() {
+        Set<String> newSigma = new HashSet<>();
+        newSigma.addAll(sigma);
+        return newSigma;
+    }
+
+
+    //深克隆一个TA，不会污染数据,注意clockSet和transition的关系
+    public TA copy() {
+        return this;
+//        return new TABuilder()
+//                .name(name)
+//                .locations(copyLocations())
+//                .transitions(copyTransitions())
+//
+//                .sigma(copySigma())
+//                .build();
+    }
+
 
 //    @Override
 //    public String toString() {
 //        StringBuilder sb = new StringBuilder();
 //        sb.append("{\n\t").append("\"sigma\":[");
-//        for (String action : getSigma()) {
-//            sb.append("\"" + action + "\",");
+//        for (String symbol : getSigma()) {
+//            sb.append("\"" + symbol + "\",");
 //        }
 //        sb.deleteCharAt(sb.length() - 1).append("],\n\t").append("\"init\":");
 //        int init = getInitLocation().getId();

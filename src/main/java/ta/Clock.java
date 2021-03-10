@@ -12,4 +12,7 @@ import java.util.Objects;
 public class Clock {
     private String name;
 
+    public Clock copy(){
+        return new Clock(name);
+    }
 }

@@ -11,7 +11,6 @@ public class DFAUtil {
     public static DFA parallelComposition(DFA dfa1, DFA dfa2) {
         //存放新旧节点对应关系的map
         Map<Pair, DfaLocation> pairLocationMap = new HashMap<>();
-        Map<DfaLocation, Pair> locationPairMap = new HashMap<>();
 
         //构造节点的笛卡尔积
         List<DfaLocation> newLocations = new ArrayList<>();
@@ -25,7 +24,6 @@ public class DFAUtil {
                         .build();
                 Pair pair = new Pair(l1, l2);
                 pairLocationMap.put(pair, newLocation);
-                locationPairMap.put(newLocation, pair);
                 newLocations.add(newLocation);
             }
         }
@@ -58,11 +56,11 @@ public class DFAUtil {
             }
             //第二种情况，只有dfa1存在的动作
             if (dfa1.containsSymbol(e) && !dfa2.containsSymbol(e)) {
-                asyncTransitions(dfa1.getTransitions(),dfa2.getLocations(),pairLocationMap,newTransitions);
+                asyncTransitions(dfa1.getTransitions(), dfa2.getLocations(), pairLocationMap, newTransitions);
             }
             //第三种情况，只有dfa2存在的动作
             if (!dfa1.containsSymbol(e) && dfa2.containsSymbol(e)) {
-                asyncTransitions(dfa2.getTransitions(),dfa1.getLocations(),pairLocationMap,newTransitions);
+                asyncTransitions(dfa2.getTransitions(), dfa1.getLocations(), pairLocationMap, newTransitions);
             }
         });
 
@@ -77,10 +75,10 @@ public class DFAUtil {
     }
 
     private static void asyncTransitions(List<DfaTransition> transitions,
-                                  List<DfaLocation> locations,
-                                  Map<Pair, DfaLocation> pairLocationMap,
-                                  List<DfaTransition> newTransitions
-                                  ){
+                                         List<DfaLocation> locations,
+                                         Map<Pair, DfaLocation> pairLocationMap,
+                                         List<DfaTransition> newTransitions
+    ) {
         for (DfaTransition t : transitions) {
             for (DfaLocation l : locations) {
                 Pair sourcePair = new Pair(t.getSourceLocation(), l);

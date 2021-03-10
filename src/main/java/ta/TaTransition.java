@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,5 +33,31 @@ public class TaTransition {
         sb.deleteCharAt(sb.length()-1);
         sb.append(", ").append(targetLocation.getId()).append("]");
         return sb.toString();
+    }
+
+    public Map<TimeGuard, Clock> copyTimeGuardClockMap(){
+        Map<TimeGuard, Clock> newTimeGuardClockMap = new HashMap<>();
+        timeGuardClockMap.keySet().stream().forEach(e->{
+            newTimeGuardClockMap.put(e.copy(),timeGuardClockMap.get(e).copy());
+        });
+        return newTimeGuardClockMap;
+    }
+
+    public Set<Clock> copyResetClockSet(){
+        Set<Clock> newClockSet= new HashSet<>();
+        resetClockSet.stream().forEach(e->{
+            newClockSet.add(e.copy());
+        });
+        return newClockSet;
+    }
+
+    public TaTransition copy() {
+        return new TaTransitionBuilder()
+                .sourceLocation(sourceLocation.copy())
+                .targetLocation(targetLocation.copy())
+                .symbol(symbol)
+                .timeGuardClockMap(copyTimeGuardClockMap())
+                .resetClockSet(copyResetClockSet())
+                .build();
     }
 }
