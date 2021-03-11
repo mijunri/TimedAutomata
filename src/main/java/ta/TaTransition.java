@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import timedAction.TimedAction;
 
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,12 +19,12 @@ public class TaTransition {
     private TaLocation sourceLocation;
     private TaLocation targetLocation;
     private String symbol;
-    private Map<Clock, TimeGuard> timeGuardClockMap;
+    private Map<Clock, TimeGuard> clockTimeGuardMap;
     private Set<Clock> resetClockSet;
 
 
     public TimeGuard getTimeGuard(Clock clock){
-        return timeGuardClockMap.get(clock);
+        return clockTimeGuardMap.get(clock);
     }
 
 
@@ -53,7 +51,7 @@ public class TaTransition {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("[").append(sourceLocation.getId()).append(", ").append(symbol).append(",");
-        for(Map.Entry<Clock, TimeGuard> entry:timeGuardClockMap.entrySet()){
+        for(Map.Entry<Clock, TimeGuard> entry: clockTimeGuardMap.entrySet()){
             sb.append(entry.getKey().getName()).append("-").append(entry.getValue()).append(" & ");
         }
         sb.deleteCharAt(sb.length()-1);
@@ -64,8 +62,8 @@ public class TaTransition {
 
     public Map<Clock,TimeGuard> copyTimeGuardClockMap(){
         Map<Clock,TimeGuard> newTimeGuardClockMap = new HashMap<>();
-        timeGuardClockMap.keySet().stream().forEach(e->{
-            newTimeGuardClockMap.put(e.copy(),timeGuardClockMap.get(e).copy());
+        clockTimeGuardMap.keySet().stream().forEach(e->{
+            newTimeGuardClockMap.put(e.copy(), clockTimeGuardMap.get(e).copy());
         });
         return newTimeGuardClockMap;
     }
@@ -83,8 +81,24 @@ public class TaTransition {
                 .sourceLocation(sourceLocation.copy())
                 .targetLocation(targetLocation.copy())
                 .symbol(symbol)
-                .timeGuardClockMap(copyTimeGuardClockMap())
+                .clockTimeGuardMap(copyTimeGuardClockMap())
                 .resetClockSet(copyResetClockSet())
                 .build();
+    }
+
+    public String getSourceId() {
+        return sourceLocation.getId();
+    }
+
+    public String getTargetId(){
+        return targetLocation.getId();
+    }
+
+    public int getLowerBound(Clock clock) {
+        return getTimeGuard(clock).getLowerBound();
+    }
+
+    public int getUpperBound(Clock clock) {
+        return getTimeGuard(clock).getUpperBound();
     }
 }

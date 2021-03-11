@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ta.ota.LogicTimedAction;
+import ta.ota.ResetLogicAction;
 
 @Data
 @NoArgsConstructor
@@ -96,24 +98,24 @@ public class TimeGuard {
 //        return new TimeGuard(leftOpen,rightOpen,left,right);
 //    }
 
-//    public static TimeGuard bottomGuard(ResetLogicAction action){
-//        double time = action.getValue();
-//        boolean leftOpen,rightOpen;
-//        int left,right;
-//        if(time == (int)time){
-//            leftOpen = false;
-//            left = (int)time;
-//            rightOpen = false;
-//            right = (int)time;
-//        }
-//        else {
-//            leftOpen = true;
-//            left = (int)time;
-//            rightOpen = true;
-//            right = (int)time+1;
-//        }
-//        return new TimeGuard(leftOpen,rightOpen,left,right);
-//    }
+    public static TimeGuard bottomGuard(LogicTimedAction action){
+        double time = action.getValue();
+        boolean leftOpen,rightOpen;
+        int left,right;
+        if(time == (int)time){
+            leftOpen = false;
+            left = (int)time;
+            rightOpen = false;
+            right = (int)time;
+        }
+        else {
+            leftOpen = true;
+            left = (int)time;
+            rightOpen = true;
+            right = (int)time+1;
+        }
+        return new TimeGuard(leftOpen,rightOpen,left,right);
+    }
 
 
     //转成整型再比较

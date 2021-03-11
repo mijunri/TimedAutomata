@@ -53,7 +53,7 @@ public final class TAUtil {
             flag:
             for (TaTransition t : taTransitions) {
                 //获取该迁移的时钟约束
-                Map<Clock, TimeGuard> timeGuardClockMap = t.getTimeGuardClockMap();
+                Map<Clock, TimeGuard> timeGuardClockMap = t.getClockTimeGuardMap();
                 //对当前DBM进行拷贝
                 DBM dbm = current.getDbm().copy();
                 //求约束后的DBM
@@ -133,8 +133,8 @@ public final class TAUtil {
                         TaLocation targetLocation = pairLocationMap.get(targetPair);
                         //时钟约束求并集
                         Map<Clock, TimeGuard> timeGuardClockMap = new HashMap<>();
-                        timeGuardClockMap.putAll(t1.getTimeGuardClockMap());
-                        timeGuardClockMap.putAll(t2.getTimeGuardClockMap());
+                        timeGuardClockMap.putAll(t1.getClockTimeGuardMap());
+                        timeGuardClockMap.putAll(t2.getClockTimeGuardMap());
                         //重置时钟集合求并集
                         Set<Clock> resetClocks = new HashSet<>();
                         resetClocks.addAll(t1.getResetClockSet());
@@ -144,7 +144,7 @@ public final class TAUtil {
                                 .sourceLocation(sourceLocation)
                                 .targetLocation(targetLocation)
                                 .symbol(t1.getSymbol())
-                                .timeGuardClockMap(timeGuardClockMap)
+                                .clockTimeGuardMap(timeGuardClockMap)
                                 .resetClockSet(resetClocks)
                                 .build();
                         newTransitions.add(newTransition);
@@ -186,7 +186,7 @@ public final class TAUtil {
                         .sourceLocation(sourceLocation)
                         .targetLocation(targetLocation)
                         .symbol(t.getSymbol())
-                        .timeGuardClockMap(t.getTimeGuardClockMap())
+                        .clockTimeGuardMap(t.getClockTimeGuardMap())
                         .resetClockSet(t.getResetClockSet())
                         .build();
                 newTransitions.add(newTransition);

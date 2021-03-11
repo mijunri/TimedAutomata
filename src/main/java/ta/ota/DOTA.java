@@ -1,5 +1,6 @@
 package ta.ota;
 
+import lombok.Data;
 import ta.*;
 
 import java.util.*;
@@ -7,6 +8,7 @@ import java.util.*;
 /**
  * DOTA是TA的一个子集，它只有一个时钟，且是确定性的
  */
+@Data
 public class DOTA extends TA {
 
     private Clock clock;

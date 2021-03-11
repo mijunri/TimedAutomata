@@ -1,5 +1,6 @@
 package ta.ota;
 
+import timedAction.ResetTimedAction;
 import timedWord.TimedWord;
 
 import java.util.ArrayList;
@@ -44,6 +45,10 @@ public class ResetLogicTimeWord extends TimedWord<ResetLogicAction> {
     public LogicTimedAction getLastLogicAction(){
         ResetLogicAction resetAction = getTimedActions().get(size()-1);
         return new LogicTimedAction(resetAction.getSymbol(),resetAction.getValue());
+    }
+
+    public ResetLogicAction getLastResetAction(){
+        return getTimedActions().get(size()-1);
     }
 
 }
