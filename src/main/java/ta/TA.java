@@ -78,29 +78,6 @@ public class TA {
     }
 
 
-    public Set<Clock> copyClockSet() {
-        Set<Clock> newClockSet = new HashSet<>();
-        clockSet.stream().forEach(e -> {
-            newClockSet.add(e.copy());
-        });
-        return newClockSet;
-    }
-
-    public List<TaLocation> copyLocations() {
-        List<TaLocation> newLocations = new ArrayList<>();
-        locations.stream().forEach(e -> {
-            newLocations.add(e.copy());
-        });
-        return newLocations;
-    }
-
-    public List<TaTransition> copyTransitions() {
-        List<TaTransition> newTransitions = new ArrayList<>();
-        transitions.stream().forEach(e -> {
-            newTransitions.add(e.copy());
-        });
-        return newTransitions;
-    }
 
     public Set<String> copySigma() {
         Set<String> newSigma = new HashSet<>();
@@ -111,14 +88,45 @@ public class TA {
 
     //TODO 深克隆一个TA，不会污染数据,注意clockSet和transition的关系
     public TA copy() {
-        return this;
-//        return new TABuilder()
-//                .name(name)
-//                .locations(copyLocations())
-//                .transitions(copyTransitions())
-//
-//                .sigma(copySigma())
-//                .build();
+        List<TaLocation> newLocations = new ArrayList<>();
+        Map<TaLocation, TaLocation> locationMap = new HashMap<>();
+        locations.forEach(e -> {
+            TaLocation newLocation = e.copy();
+            newLocations.add(newLocation);
+            locationMap.put(e, newLocation);
+        });
+        List<TaTransition> newTransitions = new ArrayList<>();
+        transitions.forEach(e -> {
+            TaLocation source = locationMap.get(e.getSourceLocation());
+            TaLocation target = locationMap.get(e.getTargetLocation());
+            String symbol = e.getSymbol();
+            Map<Clock, TimeGuard> newClockGuardMap = new HashMap<>();
+
+            e.getClockTimeGuardMap().keySet().forEach(a->{
+                TimeGuard timeGuard = e.getTimeGuard(a).copy();
+                newClockGuardMap.put(a, timeGuard);
+            });
+
+            Set<Clock> resetClocks = new HashSet<>();
+            resetClocks.addAll(e.getResetClockSet());
+            TaTransition transition = new TaTransition.TaTransitionBuilder()
+                    .sourceLocation(source)
+                    .targetLocation(target)
+                    .symbol(symbol)
+                    .clockTimeGuardMap(newClockGuardMap)
+                    .resetClockSet(resetClocks)
+                    .build();
+            newTransitions.add(transition);
+        });
+
+
+        return new TABuilder()
+                .name(name)
+                .locations(newLocations)
+                .transitions(newTransitions)
+                .sigma(copySigma())
+                .clockSet(clockSet)
+                .build();
     }
 
     public int size() {

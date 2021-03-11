@@ -76,15 +76,6 @@ public class TaTransition {
         return newClockSet;
     }
 
-    public TaTransition copy() {
-        return new TaTransitionBuilder()
-                .sourceLocation(sourceLocation.copy())
-                .targetLocation(targetLocation.copy())
-                .symbol(symbol)
-                .clockTimeGuardMap(copyTimeGuardClockMap())
-                .resetClockSet(copyResetClockSet())
-                .build();
-    }
 
     public String getSourceId() {
         return sourceLocation.getId();
