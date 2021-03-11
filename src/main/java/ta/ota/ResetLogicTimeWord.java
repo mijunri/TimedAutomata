@@ -71,6 +71,7 @@ public class ResetLogicTimeWord extends TimedWord<ResetLogicAction> {
     @Override
     public ResetLogicTimeWord concat(ResetLogicAction timedAction) {
         List<ResetLogicAction> timedActions1 = new ArrayList<>();
+        timedActions1.addAll(getTimedActions());
         timedActions1.add(timedAction);
         return new ResetLogicTimeWord(timedActions1);
     }

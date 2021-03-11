@@ -36,6 +36,7 @@ public class LogicTimeWord extends TimedWord<LogicTimedAction> {
     @Override
     public LogicTimeWord concat(LogicTimedAction timedAction){
         List<LogicTimedAction> timedActions1 = new ArrayList<>();
+        timedActions1.addAll(getTimedActions());
         timedActions1.add(timedAction);
         return new LogicTimeWord(timedActions1);
     }
