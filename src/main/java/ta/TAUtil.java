@@ -167,6 +167,7 @@ public final class TAUtil {
                 .locations(newLocations)
                 .transitions(newTransitions)
                 .sigma(sigma)
+                .clockSet(clocks)
                 .build();
         return newTA;
 

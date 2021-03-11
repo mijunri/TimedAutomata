@@ -101,7 +101,8 @@ public class DOTA extends TA {
                     }
                 }
                 end = true;
-            } else {
+            }
+            if (end){
                 ResetLogicAction resetLogicAction = new ResetLogicAction(
                         action.getSymbol(), action.getValue(), true);
                 resetActions.add(resetLogicAction);
@@ -109,4 +110,6 @@ public class DOTA extends TA {
         }
         return new ResetLogicTimeWord(resetActions);
     }
+
+
 }

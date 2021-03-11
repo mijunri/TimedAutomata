@@ -121,7 +121,9 @@ public class TA {
 //                .build();
     }
 
-
+    public int size() {
+        return locations.size();
+    }
 
 
 //    @Override

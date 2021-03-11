@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import ta.Clock;
-import ta.TaLocation;
-import ta.TaTransition;
-import ta.TimeGuard;
+import ta.*;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -56,6 +53,7 @@ public class DOTAUtil {
             boolean isInit = StringUtils.equals(id, initId);
             boolean isAccept = acceptSet.contains(id);
             TaLocation location = new TaLocation(id, id, isInit, isAccept);
+            locations.add(location);
             idLocationMap.put(id, location);
         });
 
@@ -85,4 +83,91 @@ public class DOTAUtil {
         DOTA ota = new DOTA(name, sigma, locations, transitions, clock);
         return ota;
     }
+
+    public static void completeDOTA(DOTA dota){
+
+        Clock clock = dota.getClock();
+
+        List<TaTransition> transitionList = dota.getTransitions();
+        List<TaTransition> complementaryTranList = new ArrayList<>();
+        List<TaLocation> locationList = dota.getLocations();
+        Set<String> sigma = dota.getSigma();
+
+        TaLocation sink = new TaLocation(String.valueOf(dota.size()+1),"sink", false, false);
+        for(TaLocation location: locationList){
+            for(String symbol: sigma){
+                List<TaTransition> transitions = dota.getTransitions(location,symbol,null);
+                if (transitions.isEmpty()){
+                    Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
+                    clockTimeGuardMap.put(clock, new TimeGuard("[0,+)"));
+                    Set<Clock> resetClocks = new HashSet<>();
+                    resetClocks.add(clock);
+                    TaTransition transition  = TaTransition.builder()
+                            .sourceLocation(location)
+                            .targetLocation(sink)
+                            .symbol(symbol)
+                            .resetClockSet(resetClocks)
+                            .clockTimeGuardMap(clockTimeGuardMap)
+                            .build();
+                    complementaryTranList.add(transition);
+                    continue;
+                }
+                complementaryTranList.addAll(complementary(transitions, sink, clock));
+            }
+        }
+
+        if (complementaryTranList.isEmpty()){
+            return;
+        }
+
+        Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
+        clockTimeGuardMap.put(clock, new TimeGuard("[0,+)"));
+        Set<Clock> resetClocks = new HashSet<>();
+        resetClocks.add(clock);
+        for (String symbol : sigma){
+            TaTransition transition  = TaTransition.builder()
+                    .sourceLocation(sink)
+                    .targetLocation(sink)
+                    .symbol(symbol)
+                    .resetClockSet(resetClocks)
+                    .clockTimeGuardMap(clockTimeGuardMap)
+                    .build();
+            complementaryTranList.add(transition);
+        }
+
+        transitionList.addAll(complementaryTranList);
+        locationList.add(sink);
+        transitionList.sort(new OTATranComparator(clock));
+    }
+
+    private static List<TaTransition> complementary(List<TaTransition> transitionList, TaLocation targetLocation, Clock clock){
+
+        List<TimeGuard> timeGuardList = obtainGuardList(transitionList, clock);
+        List<TimeGuard> complementaryGuardList = TimeGuardUtil.complementary(timeGuardList);
+
+        TaTransition pre = transitionList.get(0);
+        String symbol = pre.getSymbol();
+        TaLocation sourceLocation = pre.getSourceLocation();
+
+        List<TaTransition> complementaryTranList = new ArrayList<>();
+        for(TimeGuard timeGuard: complementaryGuardList){
+            Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
+            clockTimeGuardMap.put(clock, timeGuard);
+            Set<Clock> resetClocks = new HashSet<>();
+            resetClocks.add(clock);
+            TaTransition t = new TaTransition(sourceLocation, targetLocation,symbol, clockTimeGuardMap, resetClocks);
+            complementaryTranList.add(t);
+        }
+
+        return complementaryTranList;
+    }
+
+    private static List<TimeGuard> obtainGuardList(List<TaTransition> transitionList, Clock clock){
+        List<TimeGuard> timeGuardList = new ArrayList<>();
+        for(TaTransition transition: transitionList){
+            timeGuardList.add(transition.getTimeGuard(clock));
+        }
+        return timeGuardList;
+    }
+
 }
