@@ -14,7 +14,7 @@ public class DOTA extends TA {
     private Clock clock;
 
     public DOTA(String name, Set<String> sigma, List<TaLocation> locations, List<TaTransition> transitions, Clock clock) {
-        super(name, Collections.emptySet(), sigma, locations, transitions);
+        super(name, new HashSet<>(), sigma, locations, transitions);
         getClockSet().add(clock);
         this.clock = clock;
     }

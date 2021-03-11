@@ -2,17 +2,15 @@ package timedWord;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import timedAction.TimedAction;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-@Data
 @AllArgsConstructor
-public class TimedWord<T extends TimedAction> {
+public abstract class TimedWord<T extends TimedAction> {
 
+    @Getter
     private List<T> timedActions;
 
     public int size(){
@@ -27,24 +25,9 @@ public class TimedWord<T extends TimedAction> {
         return timedActions.isEmpty();
     }
 
-    public static TimedWord emptyWord(){
-        return new TimedWord(new ArrayList<>());
-    }
+    public abstract TimedWord subWord( int fromIndex, int toIndex);
 
-    public TimedWord subWord(int fromIndex, int toIndex){
-        try{
-            List<T> subList = timedActions.subList(fromIndex,toIndex);
-            return new TimedWord(subList);
-        }catch (Exception e){
-            return emptyWord();
-        }
-    }
-
-    public TimedWord<T> concat(T timedAction){
-        List<T> timedActions1 = new ArrayList<>();
-        timedActions1.add(timedAction);
-        return new TimedWord<>(timedActions1);
-    }
+    public abstract TimedWord concat(T timedAction);
 
 
 
@@ -60,4 +43,16 @@ public class TimedWord<T extends TimedAction> {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TimedWord)) return false;
+        TimedWord<?> timedWord = (TimedWord<?>) o;
+        return getTimedActions().equals(timedWord.getTimedActions());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTimedActions());
+    }
 }

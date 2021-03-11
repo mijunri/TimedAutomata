@@ -1,9 +1,12 @@
 package timedAction;
 
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+import java.util.Objects;
+
 public class ResetTimedAction extends TimedAction {
+    @Getter
     private boolean reset;
 
     public ResetTimedAction(String symbol, Double value, boolean reset) {
@@ -22,5 +25,24 @@ public class ResetTimedAction extends TimedAction {
                 .append(isReset()?"r":"n")
                 .append(")");
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (!(o instanceof ResetTimedAction)) return false;
+        if (!super.equals(o)) return false;
+
+        ResetTimedAction that = (ResetTimedAction) o;
+
+        return isReset() == that.isReset();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (isReset() ? 1 : 0);
+        return result;
     }
 }
