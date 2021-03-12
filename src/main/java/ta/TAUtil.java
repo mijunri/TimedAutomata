@@ -14,7 +14,7 @@ public final class TAUtil {
     //时间自动机的可达性算法，判断当前自动机是否存在可达的接收状态
     public static List<TransitionState> reachable(TA ta) {
         //获取时钟数组
-        List<Clock> clockList = new ArrayList<>(ta.getClockSet());
+        List<Clock> clockList = new ArrayList<>(ta.getClockList());
         //初始化DBM
         DBM initDbm = DBM.init(clockList);
         //获取初始节点
@@ -46,6 +46,7 @@ public final class TAUtil {
                     }
                     state = state.getPreState();
                 }
+                return transitionStates;
             }
             //否则，获取当前节点的后续迁移
             List<TaTransition> taTransitions = ta.getTransitions(location, null, null);
@@ -115,14 +116,14 @@ public final class TAUtil {
         sigma.addAll(ta2.getSigma());
 
         //时钟求并集
-        Set<Clock> clocks = new HashSet<>();
-        clocks.addAll(ta1.getClockSet());
-        clocks.addAll(ta2.getClockSet());
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(ta1.getClockList());
+        clocks.addAll(ta2.getClockList());
 
         //构造迁移的笛卡尔积
         //遍历sigma，分三种情况求迁移
         List<TaTransition> newTransitions = new ArrayList<>();
-        sigma.stream().forEach(e -> {
+        sigma.forEach(e -> {
             //第一种情况，两边都含有相同的动作,需要对其进行同步操作
             if (ta1.containsSymbol(e) && ta2.containsSymbol(e)) {
                 for (TaTransition t1 : ta1.getTransitions(null, e, null)) {
@@ -161,13 +162,20 @@ public final class TAUtil {
             }
         });
 
+        newTransitions.sort(new Comparator<TaTransition>() {
+            @Override
+            public int compare(TaTransition o1, TaTransition o2) {
+                return o1.getSourceId().compareTo(o2.getSourceId());
+            }
+        });
+
         //构造组合自动机TA
         TA newTA = new TA.TABuilder()
                 .name(ta1.getName() + "_" + ta2.getName())
                 .locations(newLocations)
                 .transitions(newTransitions)
                 .sigma(sigma)
-                .clockSet(clocks)
+                .clockList(clocks)
                 .build();
         return newTA;
 

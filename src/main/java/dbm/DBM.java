@@ -104,29 +104,6 @@ public class DBM {
         return true;
     }
 
-//    @Override
-//    public String toString(){
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("the dbm matrix is:\n");
-//        for(int i = 0; i < 3; i++){
-//            for(int j = 0; j < 3; j++){
-//                if(matrix[i][j].getValue() == Integer.MAX_VALUE){
-//                    sb.append("∞").append("<").append(" \t");
-//                }else {
-//                    sb.append(matrix[i][j].getValue());
-//                    if(matrix[i][j].isEqual()){
-//                        sb.append(" <=");
-//                    }else {
-//                        sb.append(" <");
-//                    }
-//                    sb.append(" \t");
-//                }
-//            }
-//            sb.append("\n");
-//        }
-//        return sb.toString();
-//    }
-
     //做一个DBM的拷贝，避免污染数据
     public DBM copy(){
         Value[][] matrix1 = new Value[size()][size()];
@@ -136,6 +113,32 @@ public class DBM {
             }
         }
         return new DBM(clockList,matrix1);
+    }
+
+    /*
+    暂定两个时钟的DBM的输出
+     */
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("the dbm matrix is:\n");
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(matrix[i][j].getValue() == Integer.MAX_VALUE){
+                    sb.append("∞").append("<").append(" \t");
+                }else {
+                    sb.append(matrix[i][j].getValue());
+                    if(matrix[i][j].isEqual()){
+                        sb.append(" <=");
+                    }else {
+                        sb.append(" <");
+                    }
+                    sb.append(" \t");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
 

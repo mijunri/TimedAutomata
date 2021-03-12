@@ -17,7 +17,7 @@ public final class DBMUtil {
             Value lower = state.getDbm().getMatrix()[0][1];
             Value upper = state.getDbm().getMatrix()[1][0];
             TimeGuard guard = new TimeGuard(!lower.isEqual(), !upper.isEqual(),
-                    lower.getValue(),upper.getValue());
+                    (-1)*lower.getValue(),upper.getValue());
             ActionGuard actionGuard = new ActionGuard(action, guard);
             actionGuards.add(actionGuard);
         }

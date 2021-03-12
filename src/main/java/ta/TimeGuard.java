@@ -13,7 +13,7 @@ import ta.ota.ResetLogicAction;
 @Builder
 public class TimeGuard {
 
-    public static final int MAX_TIME = 1000;
+    public static int MAX_TIME = 30;
 
     private boolean lowerBoundOpen;
 

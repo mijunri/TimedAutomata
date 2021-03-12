@@ -1,13 +1,12 @@
 package ta;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Clock {
+    @Getter
+    @Setter
     private String name;
 
     public Clock copy(){

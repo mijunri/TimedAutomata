@@ -81,7 +81,7 @@ public class TimeGuardUtil {
         }
 
         if(pre.getUpperBound() != TimeGuard.MAX_TIME ){
-            TimeGuard guard = new TimeGuard(pre.isUpperBoundClose(),false,
+            TimeGuard guard = new TimeGuard(pre.isUpperBoundClose(),true,
                     pre.getUpperBound() , TimeGuard.MAX_TIME);
             complementaryList.add(guard);
         }

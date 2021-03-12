@@ -14,7 +14,7 @@ import java.util.*;
 @Builder
 public class TA {
     private String name;
-    private Set<Clock> clockSet;
+    private List<Clock> clockList;
     private Set<String> sigma;
     private List<TaLocation> locations;
     private List<TaTransition> transitions;
@@ -125,7 +125,7 @@ public class TA {
                 .locations(newLocations)
                 .transitions(newTransitions)
                 .sigma(copySigma())
-                .clockSet(clockSet)
+                .clockList(clockList)
                 .build();
     }
 
