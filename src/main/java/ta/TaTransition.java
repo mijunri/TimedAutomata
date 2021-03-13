@@ -60,23 +60,6 @@ public class TaTransition {
         return sb.toString();
     }
 
-    public Map<Clock,TimeGuard> copyTimeGuardClockMap(){
-        Map<Clock,TimeGuard> newTimeGuardClockMap = new HashMap<>();
-        clockTimeGuardMap.keySet().stream().forEach(e->{
-            newTimeGuardClockMap.put(e.copy(), clockTimeGuardMap.get(e).copy());
-        });
-        return newTimeGuardClockMap;
-    }
-
-    public Set<Clock> copyResetClockSet(){
-        Set<Clock> newClockSet= new HashSet<>();
-        resetClockSet.stream().forEach(e->{
-            newClockSet.add(e.copy());
-        });
-        return newClockSet;
-    }
-
-
     public String getSourceId() {
         return sourceLocation.getId();
     }

@@ -12,4 +12,6 @@ public class ResetLogicAction extends ResetTimedAction {
     public LogicTimedAction logicTimedAction(){
         return new LogicTimedAction(getSymbol(),getValue());
     }
+
+
 }

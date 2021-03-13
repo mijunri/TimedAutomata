@@ -14,4 +14,11 @@ public class DfaLocation {
     private String name;
     private boolean init;
     private boolean accept;
+
+    @Override
+    public String toString() {
+        return "{" +
+                 name +
+                '}';
+    }
 }
