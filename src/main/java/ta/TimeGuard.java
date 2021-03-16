@@ -157,7 +157,12 @@ public class TimeGuard {
         else {
             stringBuilder.append("[");
         }
-        stringBuilder.append(lowerBound).append(",").append(upperBound);
+        stringBuilder.append(lowerBound).append(",");
+        if (upperBound< MAX_TIME){
+            stringBuilder.append(upperBound);
+        }else {
+            stringBuilder.append("+");
+        }
         if(isUpperBoundOpen()){
             stringBuilder.append(")");
         }else {

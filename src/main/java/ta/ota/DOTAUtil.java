@@ -3,6 +3,7 @@ package ta.ota;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import dfa.DFA;
 import dfa.DfaLocation;
 import dfa.DfaTransition;
@@ -11,13 +12,137 @@ import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import ta.*;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class DOTAUtil {
+
+//    public static void main(String[] args){
+//        DOTA dota = createRandomDOTA(4,2,4,1);
+//        writeDOTA2Json(dota,null);
+//    }
+
+    public static void writeDOTA2Json(DOTA dota, String path) throws IOException {
+        Clock clock = dota.getClock();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", dota.getName());
+        JSONArray sigmaArray = new JSONArray();
+        sigmaArray.addAll(dota.getSigma());
+        jsonObject.put("sigma", sigmaArray);
+        JSONArray lArray = new JSONArray();
+        for (TaLocation location: dota.getLocations()){
+            lArray.add(location.getName());
+        }
+        jsonObject.put("l",lArray);
+        JSONArray acceptArray = new JSONArray();
+        for (TaLocation location: dota.getAcceptedLocations()){
+            acceptArray.add(location.getName());
+        }
+        jsonObject.put("accept",acceptArray);
+        jsonObject.put("init",dota.getInitLocation().getName());
+        JSONObject transObject = new JSONObject();
+        dota.getTransitions().sort(new OTATranComparator(clock));
+        List<TaTransition> transitions = dota.getTransitions();
+        for (int i = 0; i < transitions.size(); i++){
+            TaTransition taTransition = transitions.get(i);
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.add(taTransition.getSourceLocation().getName());
+            jsonArray.add(taTransition.getSymbol());
+            jsonArray.add(taTransition.getTimeGuard(clock).toString());
+            jsonArray.add(taTransition.getResetClockSet().contains(clock)?"r":"n");
+            jsonArray.add(taTransition.getTargetLocation().getName());
+            transObject.put(String.valueOf(i), jsonArray);
+        }
+        jsonObject.put("tran",transObject);
+//        System.out.println(jsonObject.toString(SerializerFeature.PrettyFormat));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)));
+        bw.write(jsonObject.toString(SerializerFeature.PrettyFormat));
+        bw.flush();;
+        bw.close();
+    }
+
+    public static DOTA createRandomDOTA(int locationNum, int sigmaNum, int partitionNum, int num) {
+        String name = locationNum+"_"+sigmaNum+"_"+partitionNum+"-"+num;
+        Clock clock = new Clock("c");
+        Set<String> sigma = createSigma(sigmaNum);
+        List<TaLocation> locations = new ArrayList<>();
+        for (int i = 0; i < locationNum; i++) {
+            TaLocation location = new TaLocation(String.valueOf(i+1), String.valueOf(i+1));
+            if (i == 0) {
+                location.setInit(true);
+            }
+            if (Math.random() < 0.5) {
+                location.setAccept(true);
+            }
+            locations.add(location);
+        }
+        List<TaTransition> transitions = new ArrayList<>();
+        for (TaLocation location : locations){
+            int random = (int)(Math.random()*locationNum);
+            for (String symbol : sigma){
+                List<TimeGuard> timeGuards = createTimeGuard(partitionNum);
+                for (TimeGuard guard: timeGuards){
+                    Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
+                    clockTimeGuardMap.put(clock, guard);
+                    Set<Clock> clockSet = new HashSet<>();
+                    if (Math.random()<0.9){
+                        clockSet.add(clock);
+                    }
+                    TaLocation target = locations.get(random);
+                    TaTransition taTransition = new TaTransition(location,target,symbol,clockTimeGuardMap,clockSet);
+                    transitions.add(taTransition);
+                }
+            }
+        }
+        return new DOTA(name, sigma, locations, transitions, clock);
+    }
+
+    private static List<TimeGuard> createTimeGuard(int partionNum){
+        int max = TimeGuard.MAX_TIME;
+        Set<Integer> numberSet = new HashSet<>();
+        for (int i = 0; i < partionNum-1; i++){
+            int num = (int)(Math.random()*(max-1));
+            while (numberSet.contains(num)){
+                num = (int)(Math.random()*(max-1));
+            }
+            numberSet.add(num);
+        }
+        List<Integer> integers = new ArrayList<>(numberSet);
+        integers.sort( (o1,o2)->{
+            return o1-o2;
+        });
+        List<TimeGuard> timeGuards = new ArrayList<>();
+        for (int i = 0; i < integers.size(); i++){
+           int left = integers.get(i);
+           i++;
+           int right = 0;
+           boolean leftOpen = Math.random()<0.5;
+           boolean rightOpen = Math.random()<0.5;
+
+           if (i >= integers.size()){
+               right = TimeGuard.MAX_TIME;
+               rightOpen = true;
+           }else {
+               right = integers.get(i);
+           }
+
+           TimeGuard guard = new TimeGuard(leftOpen,rightOpen,left,right);
+           timeGuards.add(guard);
+
+        }
+        return timeGuards;
+    }
+
+    private static Set<String> createSigma(int n) {
+        Set<String> sigma = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            char c = (char) ('a' + i);
+            String s = String.valueOf(c);
+            sigma.add(s);
+        }
+        return sigma;
+    }
+
     public static DOTA getDOTAFromJsonFile(String path) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
         String str = null;

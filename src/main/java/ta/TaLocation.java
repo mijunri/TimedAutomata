@@ -12,6 +12,11 @@ public class TaLocation implements Cloneable{
     private boolean init;
     private boolean accept;
 
+    public TaLocation(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public TaLocation copy() {
         return new TaLocation(id,name,init,accept);
     }
