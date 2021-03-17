@@ -71,7 +71,7 @@ public class DOTAUtil {
             if (i == 0) {
                 location.setInit(true);
             }
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.3) {
                 location.setAccept(true);
             }
             locations.add(location);
