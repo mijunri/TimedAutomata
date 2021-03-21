@@ -78,7 +78,6 @@ public class DOTAUtil {
         }
         List<TaTransition> transitions = new ArrayList<>();
         for (TaLocation location : locations){
-            int random = (int)(Math.random()*locationNum);
             for (String symbol : sigma){
                 List<TimeGuard> timeGuards = createTimeGuard(partitionNum);
                 for (TimeGuard guard: timeGuards){
@@ -88,6 +87,7 @@ public class DOTAUtil {
                     if (Math.random()<0.9){
                         clockSet.add(clock);
                     }
+                    int random = (int)(Math.random()*locationNum);
                     TaLocation target = locations.get(random);
                     TaTransition taTransition = new TaTransition(location,target,symbol,clockTimeGuardMap,clockSet);
                     transitions.add(taTransition);
