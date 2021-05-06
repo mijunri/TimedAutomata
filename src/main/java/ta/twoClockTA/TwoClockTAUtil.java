@@ -1,4 +1,4 @@
-package ta.ota;
+package ta.twoClockTA;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -11,11 +11,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import ta.*;
+import ta.ota.DOTA;
+import ta.ota.OTATranComparator;
 
 import java.io.*;
 import java.util.*;
 
-public class DOTAUtil {
+public class TwoClockTAUtil {
 
 //    public static void main(String[] args){
 //        DOTA dota = createRandomDOTA(4,2,4,1);
@@ -223,7 +225,7 @@ public class DOTAUtil {
         List<TaLocation> locationList = dota.getLocations();
         Set<String> sigma = dota.getSigma();
 
-        TaLocation sink = new TaLocation(String.valueOf(99999), "sink", false, false);
+        TaLocation sink = new TaLocation(String.valueOf(dota.size() + 1), "sink", false, false);
         for (TaLocation location : locationList) {
             for (String symbol : sigma) {
                 List<TaTransition> transitions = dota.getTransitions(location, symbol, null);
@@ -231,7 +233,7 @@ public class DOTAUtil {
                     Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
                     clockTimeGuardMap.put(clock, new TimeGuard("[0,+)"));
                     Set<Clock> resetClocks = new HashSet<>();
-//                    resetClocks.add(clock);
+                    resetClocks.add(clock);
                     TaTransition transition = TaTransition.builder()
                             .sourceLocation(location)
                             .targetLocation(sink)
@@ -253,7 +255,7 @@ public class DOTAUtil {
         Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
         clockTimeGuardMap.put(clock, new TimeGuard("[0,+)"));
         Set<Clock> resetClocks = new HashSet<>();
-//        resetClocks.add(clock);
+        resetClocks.add(clock);
         for (String symbol : sigma) {
             TaTransition transition = TaTransition.builder()
                     .sourceLocation(sink)
@@ -284,7 +286,7 @@ public class DOTAUtil {
             Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
             clockTimeGuardMap.put(clock, timeGuard);
             Set<Clock> resetClocks = new HashSet<>();
-//            resetClocks.add(clock);
+            resetClocks.add(clock);
             TaTransition t = new TaTransition(sourceLocation, targetLocation, symbol, clockTimeGuardMap, resetClocks);
             complementaryTranList.add(t);
         }
