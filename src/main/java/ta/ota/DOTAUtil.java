@@ -231,7 +231,7 @@ public class DOTAUtil {
                     Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
                     clockTimeGuardMap.put(clock, new TimeGuard("[0,+)"));
                     Set<Clock> resetClocks = new HashSet<>();
-//                    resetClocks.add(clock);
+                    resetClocks.add(clock);
                     TaTransition transition = TaTransition.builder()
                             .sourceLocation(location)
                             .targetLocation(sink)
@@ -253,7 +253,7 @@ public class DOTAUtil {
         Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
         clockTimeGuardMap.put(clock, new TimeGuard("[0,+)"));
         Set<Clock> resetClocks = new HashSet<>();
-//        resetClocks.add(clock);
+        resetClocks.add(clock);
         for (String symbol : sigma) {
             TaTransition transition = TaTransition.builder()
                     .sourceLocation(sink)
@@ -284,7 +284,7 @@ public class DOTAUtil {
             Map<Clock, TimeGuard> clockTimeGuardMap = new HashMap<>();
             clockTimeGuardMap.put(clock, timeGuard);
             Set<Clock> resetClocks = new HashSet<>();
-//            resetClocks.add(clock);
+            resetClocks.add(clock);
             TaTransition t = new TaTransition(sourceLocation, targetLocation, symbol, clockTimeGuardMap, resetClocks);
             complementaryTranList.add(t);
         }
