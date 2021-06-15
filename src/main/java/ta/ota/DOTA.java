@@ -81,20 +81,24 @@ public class DOTA extends TA {
         TaLocation location = getInitLocation();
         //存储当前时钟值,初始化0
         double value = 0.0;
-        Map<Clock, Double> clockDoubleMap = new HashMap<>();
-        clockDoubleMap.put(clock, 0.0);
 
         List<LogicTimedAction> actions = logicTimeWord.getTimedActions();
         List<ResetLogicAction> resetActions = new ArrayList<>();
         boolean end = false;
         flag:
         for (LogicTimedAction action : actions) {
+            if (action.getValue() >= value) {
+                value = action.getValue();
+            } else {
+                end = true;
+            }
             if (!end) {
                 List<TaTransition> transitions = getTransitions(location, action.getSymbol(), null);
                 for (TaTransition transition : transitions) {
                     TimeGuard timeGuard = transition.getTimeGuard(clock);
                     if (timeGuard.isPass(action.getValue())) {
                         location = transition.getTargetLocation();
+                        value = transition.isReset(clock) ? 0.0 : value;
                         ResetLogicAction resetLogicAction = new ResetLogicAction(
                                 action.getSymbol(), action.getValue(), transition.isReset(clock));
                         resetActions.add(resetLogicAction);
@@ -104,8 +108,9 @@ public class DOTA extends TA {
                 end = true;
             }
             if (end) {
+                // end表示迁移无效，按照论文，应视为不接收重置
                 ResetLogicAction resetLogicAction = new ResetLogicAction(
-                        action.getSymbol(), action.getValue(), true);
+                        action.getSymbol(), action.getValue(), true, true);
                 resetActions.add(resetLogicAction);
             }
         }
